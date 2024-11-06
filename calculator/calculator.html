@@ -95,16 +95,16 @@
         const outputDiv = document.getElementById("output");
 
         const ingredients = [
-            { name: "Tomate", perPerson: 100, unit: "g", category: "short" },
-            { name: "Gurke", perPerson: 50, unit: "g", category: "short" },
-            { name: "Paprika", perPerson: 80, unit: "g", category: "short" },
-            { name: "Kidney Bohnen", perPerson: 40, unit: "g", category: "long" },
-            { name: "Mais", perPerson: 30, unit: "g", category: "long" },
-            { name: "Schmand", perPerson: 20, unit: "g", category: "short" },
-            { name: "Hummus", perPerson: 30, unit: "g", category: "short" },
-            { name: "Feta Käse", perPerson: 50, unit: "g", category: "short" },
-            { name: "Käse gerieben", perPerson: 25, unit: "g", category: "long" },
-            { name: "Salatkopf", perPerson: 1, unit: "Stk", category: "short" }
+            { name: "Tomate", perPerson: 100, unit: "g", category: "short", typicalPackage: 150 },
+            { name: "Gurke", perPerson: 50, unit: "g", category: "short", typicalPackage: 400 },
+            { name: "Paprika", perPerson: 80, unit: "g", category: "short", typicalPackage: 150 },
+            { name: "Kidney Bohnen", perPerson: 40, unit: "g", category: "long", typicalPackage: 240 },
+            { name: "Mais", perPerson: 30, unit: "g", category: "long", typicalPackage: 285 },
+            { name: "Schmand", perPerson: 20, unit: "g", category: "short", typicalPackage: 150 },
+            { name: "Hummus", perPerson: 30, unit: "g", category: "short", typicalPackage: 200 },
+            { name: "Feta Käse", perPerson: 50, unit: "g", category: "short", typicalPackage: 200 },
+            { name: "Käse gerieben", perPerson: 25, unit: "g", category: "long", typicalPackage: 150 },
+            { name: "Salatkopf", perPerson: 1, unit: "Stk", category: "short", typicalPackage: 400 }
         ];
 
         function initializeIngredients() {
@@ -144,9 +144,10 @@
                 const checkbox = document.getElementById(ingredient.name);
                 if (checkbox.checked) {
                     const totalAmount = ingredient.perPerson * persons;
+                    const packagesNeeded = Math.ceil(totalAmount / ingredient.typicalPackage);
                     const resultLine = document.createElement("div");
                     resultLine.className = "output-line";
-                    resultLine.textContent = `${ingredient.name}: ${totalAmount} ${ingredient.unit}`;
+                    resultLine.textContent = `${ingredient.name}: ${totalAmount} ${ingredient.unit} (ca. ${packagesNeeded} Packungen)`;
                     outputDiv.appendChild(resultLine);
                 }
             });
