@@ -7,25 +7,67 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            height: 100vh;
+            margin: 0;
         }
         .container {
             max-width: 500px;
             width: 100%;
-            padding: 10px;
+            padding: 20px;
             border: 1px solid #ddd;
             border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h3 {
+            color: #343a40;
         }
         label, button {
             margin-top: 10px;
+            display: block;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px;
+            width: 100%;
+            background-color: #28a745;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
         }
         .ingredient {
-            margin: 5px 0;
             display: flex;
-            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .ingredient label {
+            margin-left: 10px;
+            color: #495057;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background-color: #f1f3f5;
+        }
+        .output-line {
+            margin: 5px 0;
         }
     </style>
 </head>
@@ -37,38 +79,32 @@
         <input type="number" id="persons" value="1" min="1">
         
         <h3>Wähle Zutaten (lang haltbar)</h3>
-        <div id="long-lasting">
-            <!-- Zutaten mit Checkboxen für lang haltbare Zutaten -->
-        </div>
+        <div id="long-lasting"></div>
         
         <h3>Wähle Zutaten (kurz haltbar)</h3>
-        <div id="short-lasting">
-            <!-- Zutaten mit Checkboxen für kurz haltbare Zutaten -->
-        </div>
+        <div id="short-lasting"></div>
         
         <button onclick="calculateIngredients()">Berechne Zutaten</button>
         
         <h3>Benötigte Mengen</h3>
-        <div id="output">
-            <!-- Berechnetes Ergebnis wird hier angezeigt -->
-        </div>
+        <div id="output"></div>
     </div>
 
     <script>
         const personsInput = document.getElementById("persons");
         const outputDiv = document.getElementById("output");
-        
+
         const ingredients = [
-            { name: "Tomate", perPerson: 100, category: "short" },
-            { name: "Gurke", perPerson: 50, category: "short" },
-            { name: "Paprika", perPerson: 80, category: "short" },
-            { name: "Kidney Bohnen", perPerson: 40, category: "long" },
-            { name: "Mais", perPerson: 30, category: "long" },
-            { name: "Schmand", perPerson: 20, category: "short" },
-            { name: "Hummus", perPerson: 30, category: "short" },
-            { name: "Feta Käse", perPerson: 50, category: "short" },
-            { name: "Käse gerieben", perPerson: 25, category: "long" },
-            { name: "Salatkopf", perPerson: 80, category: "short" }
+            { name: "Tomate", perPerson: 100, unit: "g", category: "short" },
+            { name: "Gurke", perPerson: 50, unit: "g", category: "short" },
+            { name: "Paprika", perPerson: 80, unit: "g", category: "short" },
+            { name: "Kidney Bohnen", perPerson: 40, unit: "g", category: "long" },
+            { name: "Mais", perPerson: 30, unit: "g", category: "long" },
+            { name: "Schmand", perPerson: 20, unit: "g", category: "short" },
+            { name: "Hummus", perPerson: 30, unit: "g", category: "short" },
+            { name: "Feta Käse", perPerson: 50, unit: "g", category: "short" },
+            { name: "Käse gerieben", perPerson: 25, unit: "g", category: "long" },
+            { name: "Salatkopf", perPerson: 1, unit: "Stk", category: "short" }
         ];
 
         function initializeIngredients() {
@@ -78,15 +114,16 @@
             ingredients.forEach(ingredient => {
                 const container = document.createElement("div");
                 container.className = "ingredient";
-                
+
                 const checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
                 checkbox.id = ingredient.name;
                 checkbox.value = ingredient.name;
-                
+                checkbox.checked = true;
+
                 const label = document.createElement("label");
                 label.htmlFor = ingredient.name;
-                label.textContent = ingredient.name;
+                label.textContent = `${ingredient.name} (${ingredient.unit})`;
 
                 container.appendChild(checkbox);
                 container.appendChild(label);
@@ -108,7 +145,8 @@
                 if (checkbox.checked) {
                     const totalAmount = ingredient.perPerson * persons;
                     const resultLine = document.createElement("div");
-                    resultLine.textContent = `${ingredient.name}: ${totalAmount} g`;
+                    resultLine.className = "output-line";
+                    resultLine.textContent = `${ingredient.name}: ${totalAmount} ${ingredient.unit}`;
                     outputDiv.appendChild(resultLine);
                 }
             });
