@@ -131,7 +131,7 @@
     </div>
 
     <script>
-        let personCount = 1;
+        let personCount = 6;
         const countDisplay = document.getElementById("countDisplay");
         const outputDiv = document.getElementById("output");
 
@@ -207,7 +207,7 @@
                     const packagesNeeded = Math.ceil(totalAmount / ingredient.typicalPackage);
                     const resultLine = document.createElement("div");
                     resultLine.className = "output-line";
-                    resultLine.textContent = `${ingredient.name}: ${totalAmount} ${ingredient.unit} (ca. ${packagesNeeded} Packungen)`;
+                    resultLine.textContent = `${ingredient.name}: ${totalAmount} ${ingredient.unit} (ca. ${packagesNeeded} Pk)`;
                     outputDiv.appendChild(resultLine);
                 }
             });
