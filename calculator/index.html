@@ -88,6 +88,14 @@
         
         <h3>Benötigte Mengen</h3>
         <div id="output"></div>
+
+        <h3>Denke auch an:</h3>
+        <ul>
+            <li>Salsa</li>
+            <li>Ketchup</li>
+            <li>Pfeffer</li>
+            <li>Salz</li>
+        </ul>
     </div>
 
     <script>
@@ -95,16 +103,18 @@
         const outputDiv = document.getElementById("output");
 
         const ingredients = [
-            { name: "Tomate", perPerson: 100, unit: "g", category: "short", typicalPackage: 150 },
-            { name: "Gurke", perPerson: 50, unit: "g", category: "short", typicalPackage: 400 },
-            { name: "Paprika", perPerson: 80, unit: "g", category: "short", typicalPackage: 150 },
-            { name: "Kidney Bohnen", perPerson: 40, unit: "g", category: "long", typicalPackage: 240 },
-            { name: "Mais", perPerson: 30, unit: "g", category: "long", typicalPackage: 285 },
-            { name: "Schmand", perPerson: 20, unit: "g", category: "short", typicalPackage: 150 },
-            { name: "Hummus", perPerson: 30, unit: "g", category: "short", typicalPackage: 200 },
-            { name: "Feta Käse", perPerson: 50, unit: "g", category: "short", typicalPackage: 200 },
-            { name: "Käse gerieben", perPerson: 25, unit: "g", category: "long", typicalPackage: 150 },
-            { name: "Salatkopf", perPerson: 1, unit: "Stk", category: "short", typicalPackage: 400 }
+            { name: "Tomate", perPerson: 0.5, unit: "Stk", category: "short", typicalPackage: 150 },
+            { name: "Gurke", perPerson: 0.1, unit: "Stk", category: "short", typicalPackage: 400 },
+            { name: "Paprika", perPerson: 0.1666, unit: "Stk", category: "short", typicalPackage: 150 },
+            { name: "Kidney Bohnen", perPerson: 0.125, unit: "Dose", category: "long", typicalPackage: 240 },
+            { name: "Mais", perPerson: 0.125, unit: "Dose", category: "long", typicalPackage: 285 },
+            { name: "Schmand", perPerson: 0.1666, unit: "Stk", category: "long", typicalPackage: 150 },
+            { name: "Hummus", perPerson: 0.1666, unit: "Stk", category: "long", typicalPackage: 200 },
+            { name: "Feta oder Käse", perPerson: 50, unit: "Stk", category: "long", typicalPackage: 200 },
+            { name: "Falafel", perPerson: 0.5, unit: "Stk", category: "long", typicalPackage: 200 },
+            { name: "Eisbergsalat", perPerson: 0.1, unit: "Stk", category: "short", typicalPackage: 400 },
+            { name: "Wraps", perPerson: 3, unit: "Stk", category: "long", typicalPackage: 200 },
+            { name: "Thunfisch", perPerson: 0.25, unit: "Dose", category: "long", typicalPackage: 200 }
         ];
 
         function initializeIngredients() {
