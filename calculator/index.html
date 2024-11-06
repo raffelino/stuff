@@ -115,7 +115,7 @@
             <h3>Wähle Zutaten (kurz haltbar)</h3>
             <div id="short-lasting"></div>
         </div>
-        
+
         <button onclick="calculateIngredients()">Berechne Zutaten</button>
         
         <h3>Benötigte Mengen</h3>
@@ -198,7 +198,9 @@
         function calculateIngredients() {
             outputDiv.innerHTML = "";
 
-            ingredients.forEach(ingredient => {
+            let ingredientsSorted = ingredients.sort((a, b) => a.name.localeCompare(b.name));
+
+            ingredientsSorted.forEach(ingredient => {
                 const checkbox = document.getElementById(ingredient.name);
                 if (checkbox.checked) {
                     const totalAmount = Math.round(((ingredient.perPerson * personCount) + Number.EPSILON) * 100) / 100;
