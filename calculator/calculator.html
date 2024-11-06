@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zutatenrechner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        label, button {
+            margin-top: 10px;
+        }
+        .ingredient {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Zutatenrechner</h1>
+        
+        <label for="persons">Anzahl Personen:</label>
+        <input type="number" id="persons" value="1" min="1">
+        
+        <h3>Wähle Zutaten (lang haltbar)</h3>
+        <div id="long-lasting">
+            <!-- Zutaten mit Checkboxen für lang haltbare Zutaten -->
+        </div>
+        
+        <h3>Wähle Zutaten (kurz haltbar)</h3>
+        <div id="short-lasting">
+            <!-- Zutaten mit Checkboxen für kurz haltbare Zutaten -->
+        </div>
+        
+        <button onclick="calculateIngredients()">Berechne Zutaten</button>
+        
+        <h3>Benötigte Mengen</h3>
+        <div id="output">
+            <!-- Berechnetes Ergebnis wird hier angezeigt -->
+        </div>
+    </div>
+
+    <script>
+        const personsInput = document.getElementById("persons");
+        const outputDiv = document.getElementById("output");
+        
+        const ingredients = [
+            { name: "Tomate", perPerson: 100, category: "short" },
+            { name: "Gurke", perPerson: 50, category: "short" },
+            { name: "Paprika", perPerson: 80, category: "short" },
+            { name: "Kidney Bohnen", perPerson: 40, category: "long" },
+            { name: "Mais", perPerson: 30, category: "long" },
+            { name: "Schmand", perPerson: 20, category: "short" },
+            { name: "Hummus", perPerson: 30, category: "short" },
+            { name: "Feta Käse", perPerson: 50, category: "short" },
+            { name: "Käse gerieben", perPerson: 25, category: "long" },
+            { name: "Salatkopf", perPerson: 80, category: "short" }
+        ];
+
+        function initializeIngredients() {
+            const longLastingDiv = document.getElementById("long-lasting");
+            const shortLastingDiv = document.getElementById("short-lasting");
+
+            ingredients.forEach(ingredient => {
+                const container = document.createElement("div");
+                container.className = "ingredient";
+                
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.id = ingredient.name;
+                checkbox.value = ingredient.name;
+                
+                const label = document.createElement("label");
+                label.htmlFor = ingredient.name;
+                label.textContent = ingredient.name;
+
+                container.appendChild(checkbox);
+                container.appendChild(label);
+
+                if (ingredient.category === "long") {
+                    longLastingDiv.appendChild(container);
+                } else {
+                    shortLastingDiv.appendChild(container);
+                }
+            });
+        }
+
+        function calculateIngredients() {
+            const persons = parseInt(personsInput.value);
+            outputDiv.innerHTML = "";
+
+            ingredients.forEach(ingredient => {
+                const checkbox = document.getElementById(ingredient.name);
+                if (checkbox.checked) {
+                    const totalAmount = ingredient.perPerson * persons;
+                    const resultLine = document.createElement("div");
+                    resultLine.textContent = `${ingredient.name}: ${totalAmount} g`;
+                    outputDiv.appendChild(resultLine);
+                }
+            });
+        }
+
+        initializeIngredients();
+    </script>
+</body>
+</html>
