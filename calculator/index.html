@@ -30,18 +30,38 @@
         h1, h3 {
             color: #343a40;
         }
-        label, button {
-            margin-top: 10px;
-            display: block;
+        .person-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
         }
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
+        .count-display {
+            font-size: 32px;
+            margin: 0 20px;
+            padding: 10px;
             border: 1px solid #ced4da;
             border-radius: 4px;
+            background-color: #f1f3f5;
+            width: 60px;
+            text-align: center;
+        }
+        .counter-btn {
+            padding: 10px;
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border: none;
+            background-color: #28a745;
+            color: #ffffff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .counter-btn:hover {
+            background-color: #218838;
         }
         button {
+            margin-top: 20px;
             padding: 10px;
             width: 100%;
             background-color: #28a745;
@@ -81,8 +101,12 @@
 
         <h1>Zutatenrechner</h1>
         
-        <label for="persons">Anzahl Personen:</label>
-        <input type="number" id="persons" value="1" min="1">
+        <h3>Anzahl Personen:</h3>
+        <div class="person-counter">
+            <button class="counter-btn" onclick="decrementCount()">-</button>
+            <div class="count-display" id="countDisplay">1</div>
+            <button class="counter-btn" onclick="incrementCount()">+</button>
+        </div>
         
         <h3>Wähle Zutaten (lang haltbar)</h3>
         <div id="long-lasting"></div>
@@ -105,7 +129,8 @@
     </div>
 
     <script>
-        const personsInput = document.getElementById("persons");
+        let personCount = 1;
+        const countDisplay = document.getElementById("countDisplay");
         const outputDiv = document.getElementById("output");
 
         const ingredients = [
@@ -116,12 +141,28 @@
             { name: "Mais", perPerson: 0.125, unit: "Dose", category: "long", typicalPackage: 1 },
             { name: "Schmand", perPerson: 0.1666, unit: "Stk", category: "long", typicalPackage: 1 },
             { name: "Hummus", perPerson: 0.1666, unit: "Stk", category: "long", typicalPackage: 1 },
-            { name: "Feta oder Käse", perPerson: 50, unit: "Stk", category: "long", typicalPackage: 1 },
+            { name: "Feta oder Käse", perPerson: 0.1666, unit: "Stk", category: "long", typicalPackage: 1 },
             { name: "Falafel", perPerson: 0.5, unit: "Stk", category: "long", typicalPackage: 1 },
             { name: "Eisbergsalat", perPerson: 0.1, unit: "Stk", category: "short", typicalPackage: 1 },
             { name: "Wraps", perPerson: 3, unit: "Stk", category: "long", typicalPackage: 6 },
             { name: "Thunfisch", perPerson: 0.25, unit: "Dose", category: "long", typicalPackage: 1 }
         ];
+
+        function incrementCount() {
+            personCount++;
+            updateCountDisplay();
+        }
+
+        function decrementCount() {
+            if (personCount > 1) {
+                personCount--;
+                updateCountDisplay();
+            }
+        }
+
+        function updateCountDisplay() {
+            countDisplay.textContent = personCount;
+        }
 
         function initializeIngredients() {
             const longLastingDiv = document.getElementById("long-lasting");
@@ -153,13 +194,12 @@
         }
 
         function calculateIngredients() {
-            const persons = parseInt(personsInput.value);
             outputDiv.innerHTML = "";
 
             ingredients.forEach(ingredient => {
                 const checkbox = document.getElementById(ingredient.name);
                 if (checkbox.checked) {
-                    const totalAmount = Math.round(((ingredient.perPerson * persons) + Number.EPSILON) * 100) / 100;
+                    const totalAmount = Math.round(((ingredient.perPerson * personCount) + Number.EPSILON) * 100) / 100;
                     const packagesNeeded = Math.ceil(totalAmount / ingredient.typicalPackage);
                     const resultLine = document.createElement("div");
                     resultLine.className = "output-line";
