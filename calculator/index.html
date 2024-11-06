@@ -159,7 +159,7 @@
             ingredients.forEach(ingredient => {
                 const checkbox = document.getElementById(ingredient.name);
                 if (checkbox.checked) {
-                    const totalAmount = ingredient.perPerson * persons;
+                    const totalAmount = Math.round(((ingredient.perPerson * persons) + Number.EPSILON) * 100) / 100;
                     const packagesNeeded = Math.ceil(totalAmount / ingredient.typicalPackage);
                     const resultLine = document.createElement("div");
                     resultLine.className = "output-line";
