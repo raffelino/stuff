@@ -1,0 +1,6 @@
+case Example:
+    step ExampleStep:
+        browser_NewBrowser(HEADLESS = "false")
+        browser_NewPage(URL = "https://www.viadee.de")
+        browser_GetAttribute(SELECTOR = "//body", ATTRIBUTE = "class", TARGETSTORAGEKEY = "data")
+        success(MESSAGE = "§data§")
