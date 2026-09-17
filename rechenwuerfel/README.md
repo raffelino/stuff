@@ -86,6 +86,11 @@ Hintergrund: `dx` reicht `invokedynamic` aus der Kotlin-Stdlib unverändert durc
 
 Der Schlüssel `tools/nosdk/rechenwuerfel.p12` (Passwort `rechenwuerfel`) ist ein reiner **Entwicklungsschlüssel**. Für eine Veröffentlichung im Play Store muss ein eigener, geheimer Schlüssel verwendet werden.
 
+## Web-Version
+
+Unter `web/` liegt das Spiel zusätzlich als statische Webseite (HTML, JavaScript, Web Audio), die sich direkt
+auf GitHub Pages hosten lässt. Anleitung, lokaler Start und Tests: [web/README.md](web/README.md).
+
 ## Installation auf dem Handy
 
 APK aufs Gerät kopieren, antippen und die Installation aus unbekannter Quelle erlauben – oder per USB:

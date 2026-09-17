@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rechenwürfel</title>
+<meta name="description" content="Rechen-Brettspiel für 1 bis 4 Spieler: würfeln, Aufgabe lösen, Figur vorziehen.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎲%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;900&display=swap">
+<style>
+:root {
+  --ink: #1F2440;
+  --ink-soft: #5C6280;
+  --paper: #FFFFFF;
+  --paper-soft: #F3F1FA;
+  --ground-top: #5C6BC0;
+  --ground-bottom: #26A69A;
+  --primary: #3949AB;
+  --accent: #FFB300;
+  --coral: #FF7043;
+  --coral-deep: #E64A19;
+  --sky: #42A5F5;
+  --sky-deep: #1E88E5;
+  --key: #ECEFF1;
+  --key-press: #CFD8DC;
+  --key-ok: #66BB6A;
+  --key-back: #EF9A9A;
+  --chip: #E8EAF6;
+  --chip-line: #9FA8DA;
+  --line: rgba(31, 36, 64, 0.14);
+  --shadow: 0 10px 30px rgba(20, 24, 60, 0.18);
+  --board-road: rgba(255, 255, 255, 0.45);
+  --font-display: "Baloo 2", "Nunito", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #EEF0FF;
+    --ink-soft: #AEB4D6;
+    --paper: #232A4F;
+    --paper-soft: #2C3460;
+    --ground-top: #1B2145;
+    --ground-bottom: #123B3A;
+    --key: #3A4373;
+    --key-press: #4A5490;
+    --chip: #333C6A;
+    --chip-line: #5C67A6;
+    --line: rgba(238, 240, 255, 0.16);
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    --board-road: rgba(255, 255, 255, 0.18);
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #EEF0FF;
+  --ink-soft: #AEB4D6;
+  --paper: #232A4F;
+  --paper-soft: #2C3460;
+  --ground-top: #1B2145;
+  --ground-bottom: #123B3A;
+  --key: #3A4373;
+  --key-press: #4A5490;
+  --chip: #333C6A;
+  --chip-line: #5C67A6;
+  --line: rgba(238, 240, 255, 0.16);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --board-road: rgba(255, 255, 255, 0.18);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--ground-top), var(--ground-bottom)) fixed;
+  -webkit-font-smoothing: antialiased;
+}
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+input { font: inherit; color: var(--ink); }
+
+#app {
+  height: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 12px 16px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+}
+.screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+h1, h2, h3, .display { font-family: var(--font-display); font-weight: 800; text-wrap: balance; margin: 0; }
+.on-ground { color: #fff; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  border: 0; border-radius: 16px;
+  padding: 14px 22px;
+  font-family: var(--font-display); font-weight: 800; font-size: 1.25rem;
+  color: #fff; background: var(--coral);
+  box-shadow: 0 4px 0 var(--coral-deep);
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--coral-deep); }
+.btn:disabled { background: #9E9E9E; box-shadow: 0 4px 0 #757575; cursor: default; }
+.btn.secondary { background: var(--sky); box-shadow: 0 4px 0 var(--sky-deep); }
+.btn.secondary:active { box-shadow: 0 1px 0 var(--sky-deep); }
+.btn.block { width: 100%; }
+.btn.small { font-size: 1.05rem; padding: 11px 16px; }
+
+.chip {
+  border: 1px solid var(--chip-line); border-radius: 999px;
+  background: var(--chip); color: var(--ink);
+  padding: 7px 14px; font-weight: 700; font-size: .95rem;
+}
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #1F2440; }
+
+.icon-btn {
+  border: 0; background: transparent; font-size: 1.35rem; line-height: 1;
+  width: 42px; height: 42px; border-radius: 12px;
+}
+.icon-btn[aria-pressed="false"] { opacity: .45; }
+.icon-btn:hover { background: var(--paper-soft); }
+
+/* ---------- Karten / Felder ---------- */
+.card { background: var(--paper); border-radius: 20px; padding: 14px; box-shadow: var(--shadow); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: .9rem; font-weight: 700; color: var(--ink-soft); }
+.num {
+  width: 92px; padding: 9px 10px; text-align: center; font-weight: 700; font-size: 1.05rem;
+  border: 1px solid var(--chip-line); border-radius: 12px; background: var(--paper);
+  font-variant-numeric: tabular-nums;
+}
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+/* ---------- Menü ---------- */
+#screen-menu { justify-content: center; align-items: center; text-align: center; gap: 14px; }
+#screen-menu .die { font-size: 6rem; line-height: 1; animation: wobble 4s ease-in-out infinite; }
+@keyframes wobble { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+#screen-menu h1 { font-size: 2.8rem; }
+#screen-menu p { margin: 0 0 18px; color: rgba(255,255,255,.9); font-weight: 700; }
+#screen-menu .btn { width: min(100%, 320px); }
+@media (prefers-reduced-motion: reduce) { #screen-menu .die { animation: none; } }
+
+/* ---------- Setup ---------- */
+#screen-setup { overflow-y: auto; gap: 12px; }
+#screen-setup h2 { font-size: 1.9rem; text-align: center; }
+.section-title { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.35); margin-top: 6px; }
+.player { display: flex; flex-direction: column; gap: 10px; }
+.player .head { display: flex; align-items: center; gap: 10px; }
+.badge { color: #fff; font-weight: 900; font-size: .85rem; padding: 5px 10px; border-radius: 10px; white-space: nowrap; }
+.player input[type="text"] {
+  flex: 1; min-width: 0; padding: 9px 12px; font-size: 1.05rem; font-weight: 700;
+  border: 1px solid var(--chip-line); border-radius: 12px; background: var(--paper);
+}
+.figures { display: flex; gap: 6px; overflow-x: auto; padding: 2px; scrollbar-width: thin; }
+.figure {
+  flex: 0 0 46px; width: 46px; height: 46px; border-radius: 50%;
+  border: 2px solid var(--line); background: var(--paper-soft); font-size: 1.5rem; line-height: 1;
+}
+.figure[aria-pressed="true"] { background: #FFF176; border-color: var(--accent); color: #000; }
+.figure.taken { opacity: .3; }
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.steps .op { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.steps .op span { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; line-height: 1; }
+.steps .num { width: 100%; max-width: 72px; }
+.settings-card { display: flex; flex-direction: column; gap: 14px; }
+
+/* ---------- Spiel ---------- */
+#screen-game { gap: 8px; }
+.game-head {
+  display: flex; align-items: center; gap: 4px;
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  border-radius: 16px; padding: 4px 6px 4px 14px;
+}
+#turn { flex: 1; min-width: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.board-wrap { flex: 1 1 0; min-height: 160px; position: relative; }
+#board { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.panel { flex: 0 0 auto; height: 44%; min-height: 250px; background: var(--paper); border-radius: 20px; padding: 12px; box-shadow: var(--shadow); display: flex; }
+.panel > section { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+
+/* Würfel */
+#panel-roll { align-items: center; justify-content: center; }
+.dice-stage { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+#dice {
+  width: min(120px, 22vh); height: min(120px, 22vh);
+  border-radius: 22%; background: #fff; border: 4px solid var(--face-color, #2E7D32);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 800; font-size: min(72px, 13vh); color: var(--face-color, #2E7D32);
+  box-shadow: 0 8px 0 rgba(0,0,0,.15);
+  transition: transform .06s linear;
+}
+#dice.emoji { font-size: min(56px, 10vh); }
+#dice.settle { animation: settle .25s ease-out; }
+@keyframes settle { 0% { transform: scale(1.18); } 100% { transform: scale(1); } }
+.hint { color: var(--ink-soft); font-weight: 700; text-align: center; }
+.hint.small { font-size: .85rem; font-weight: 400; }
+
+/* Joker */
+#panel-joker { justify-content: center; align-items: center; text-align: center; }
+.joker-ops { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; }
+.joker-ops .key { height: 68px; font-size: 2rem; }
+
+/* Aufgabe */
+.timer { display: flex; align-items: center; gap: 8px; }
+.timer .bar { flex: 1; height: 14px; border-radius: 8px; background: var(--key); overflow: hidden; }
+.timer .fill { height: 100%; width: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--coral), var(--key-ok)); transition: width .05s linear; }
+#time-left { min-width: 44px; text-align: right; font-weight: 900; font-variant-numeric: tabular-nums; }
+.question { display: flex; align-items: center; justify-content: center; gap: 12px; }
+#question { font-family: var(--font-display); font-weight: 800; font-size: 1.9rem; font-variant-numeric: tabular-nums; }
+#answer {
+  min-width: 96px; padding: 4px 12px; text-align: center;
+  font-family: var(--font-display); font-weight: 800; font-size: 1.9rem; color: var(--primary);
+  border: 1px solid var(--chip-line); border-radius: 12px; background: var(--paper); font-variant-numeric: tabular-nums;
+}
+.keypad { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 6px; min-height: 0; }
+.key {
+  border: 1px solid var(--line); border-radius: 10px; background: var(--key);
+  font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--ink);
+  min-height: 40px;
+}
+.key:active { background: var(--key-press); }
+.key.ok { background: var(--key-ok); color: #fff; }
+.key.back { background: var(--key-back); color: #1F2440; }
+
+/* Meldung / Sieg */
+#panel-message, #panel-win { justify-content: center; }
+#message, #winner { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; white-space: pre-line; }
+#winner { font-size: 1.6rem; }
+.win-actions { display: flex; gap: 8px; }
+.win-actions .btn { flex: 1; }
+
+/* ---------- Dialoge ---------- */
+dialog {
+  border: 0; border-radius: 20px; padding: 20px 22px; max-width: min(92vw, 420px);
+  background: var(--paper); color: var(--ink); box-shadow: var(--shadow);
+}
+dialog::backdrop { background: rgba(10, 12, 40, .55); }
+dialog h3 { font-size: 1.4rem; margin-bottom: 10px; }
+dialog p { margin: 0 0 10px; line-height: 1.5; }
+dialog .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+.switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; font-weight: 700; }
+.switch input { width: 22px; height: 22px; accent-color: var(--primary); }
+
+@media (max-height: 640px) {
+  .panel { min-height: 220px; }
+  #question, #answer { font-size: 1.5rem; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Hauptmenü -->
+  <section id="screen-menu" class="screen">
+    <div class="die" aria-hidden="true">🎲</div>
+    <h1 class="on-ground">Rechenwürfel</h1>
+    <p>Würfeln · Rechnen · Gewinnen</p>
+    <button class="btn" id="btn-play">▶ Spielen</button>
+    <button class="btn secondary" id="btn-rules">📖 Anleitung</button>
+    <button class="btn secondary" id="btn-options">⚙ Optionen</button>
+  </section>
+
+  <!-- Spiel einrichten -->
+  <section id="screen-setup" class="screen" hidden>
+    <h2 class="on-ground">Neues Spiel</h2>
+
+    <div class="section-title">Spieler</div>
+    <div class="row on-ground" style="font-weight:700">
+      <span>Anzahl Spieler</span>
+      <div class="row" id="player-count" role="group" aria-label="Anzahl Spieler">
+        <button class="chip" data-count="1" aria-pressed="false">1</button>
+        <button class="chip" data-count="2" aria-pressed="true">2</button>
+        <button class="chip" data-count="3" aria-pressed="false">3</button>
+        <button class="chip" data-count="4" aria-pressed="false">4</button>
+      </div>
+    </div>
+    <div id="players"></div>
+
+    <div class="section-title">Einstellungen</div>
+    <div class="card settings-card">
+      <div class="field">
+        <label for="set-range">Zahlenraum bis</label>
+        <div class="row">
+          <input class="num" id="set-range" type="number" inputmode="numeric" min="5" max="10000">
+          <button class="chip" data-set="range" data-value="20">20</button>
+          <button class="chip" data-set="range" data-value="50">50</button>
+          <button class="chip" data-set="range" data-value="100">100</button>
+          <button class="chip" data-set="range" data-value="1000">1000</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="set-seconds">Zeit pro Aufgabe (Sekunden)</label>
+        <div class="row">
+          <input class="num" id="set-seconds" type="number" inputmode="numeric" min="3" max="600">
+          <button class="chip" data-set="seconds" data-value="10">10</button>
+          <button class="chip" data-set="seconds" data-value="20">20</button>
+          <button class="chip" data-set="seconds" data-value="30">30</button>
+          <button class="chip" data-set="seconds" data-value="60">60</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="set-fields">Anzahl Felder auf dem Brett</label>
+        <input class="num" id="set-fields" type="number" inputmode="numeric" min="6" max="120">
+      </div>
+      <div class="field">
+        <label>Felder vor bei richtiger Antwort</label>
+        <div class="steps">
+          <div class="op"><span style="color:#2E7D32">+</span><input class="num" id="set-steps-plus" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Plus"></div>
+          <div class="op"><span style="color:#C62828">−</span><input class="num" id="set-steps-minus" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Minus"></div>
+          <div class="op"><span style="color:#1565C0">×</span><input class="num" id="set-steps-times" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Mal"></div>
+          <div class="op"><span style="color:#6A1B9A">÷</span><input class="num" id="set-steps-divide" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Geteilt"></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn block" id="btn-start" style="margin-top:8px">🎲 Spiel starten</button>
+    <button class="btn secondary block small" id="btn-setup-back">← Zurück zum Menü</button>
+  </section>
+
+  <!-- Spiel -->
+  <section id="screen-game" class="screen" hidden>
+    <div class="game-head">
+      <div id="turn">Spieler 1 ist dran</div>
+      <button class="icon-btn" id="btn-music" aria-pressed="true" title="Musik an/aus">🎵</button>
+      <button class="icon-btn" id="btn-sfx" aria-pressed="true" title="Soundeffekte an/aus">🔊</button>
+      <button class="icon-btn" id="btn-quit" title="Spiel beenden">🏠</button>
+    </div>
+
+    <div class="board-wrap"><canvas id="board" aria-label="Spielbrett" role="img"></canvas></div>
+
+    <div class="panel">
+      <section id="panel-roll">
+        <div class="dice-stage"><div id="dice" aria-live="polite">+</div></div>
+        <div class="hint" id="dice-hint">Tippe auf „Würfeln“</div>
+        <button class="btn block" id="btn-roll">🎲 Würfeln</button>
+        <div class="hint small" id="steps-hint"></div>
+      </section>
+
+      <section id="panel-joker" hidden>
+        <div class="display" style="font-size:1.25rem">🃏 Joker! Such dir eine Rechenart aus:</div>
+        <div class="joker-ops">
+          <button class="key" data-op="PLUS" style="color:#2E7D32">+</button>
+          <button class="key" data-op="MINUS" style="color:#C62828">−</button>
+          <button class="key" data-op="TIMES" style="color:#1565C0">×</button>
+          <button class="key" data-op="DIVIDE" style="color:#6A1B9A">÷</button>
+        </div>
+      </section>
+
+      <section id="panel-task" hidden>
+        <div class="timer"><div class="bar"><div class="fill" id="time-fill"></div></div><div id="time-left">30 s</div></div>
+        <div class="question"><div id="question">23 + 45 = ?</div><div id="answer" aria-live="polite">_</div></div>
+        <div class="hint small" id="task-info"></div>
+        <div class="keypad" id="keypad">
+          <button class="key" data-key="7">7</button><button class="key" data-key="8">8</button><button class="key" data-key="9">9</button>
+          <button class="key" data-key="4">4</button><button class="key" data-key="5">5</button><button class="key" data-key="6">6</button>
+          <button class="key" data-key="1">1</button><button class="key" data-key="2">2</button><button class="key" data-key="3">3</button>
+          <button class="key back" data-key="back" aria-label="Löschen">⌫</button><button class="key" data-key="0">0</button><button class="key ok" data-key="ok" aria-label="Antwort prüfen">✔</button>
+        </div>
+      </section>
+
+      <section id="panel-message" hidden>
+        <div id="message"></div>
+        <button class="btn block" id="btn-next">Weiter ➜</button>
+      </section>
+
+      <section id="panel-win" hidden>
+        <div id="winner"></div>
+        <div class="win-actions">
+          <button class="btn small" id="btn-again">🔄 Nochmal spielen</button>
+          <button class="btn secondary small" id="btn-menu">🏠 Zum Menü</button>
+        </div>
+      </section>
+    </div>
+  </section>
+</div>
+
+<dialog id="dlg-rules">
+  <h3>So wird gespielt</h3>
+  <p>Bis zu vier Spieler wählen eine Figur und einen Namen.</p>
+  <p>Wer an der Reihe ist, tippt auf den Würfel. Der Würfel zeigt eine Rechenart: Plus, Minus, Mal oder Geteilt. Dazu gibt es einen Joker (Rechenart selbst aussuchen) und Aussetzen.</p>
+  <p>Dann erscheint eine Rechenaufgabe im eingestellten Zahlenraum. Wird sie innerhalb der Zeit richtig gelöst, zieht die Figur vor: Plus 1 Feld, Minus 2, Mal 3, Geteilt 4 (einstellbar). Bei falscher Antwort oder abgelaufener Zeit bleibt die Figur stehen.</p>
+  <p>Wer zuerst das Ziel erreicht, gewinnt!</p>
+  <div class="actions"><button class="btn secondary small" id="btn-rules-ok">OK</button></div>
+</dialog>
+
+<dialog id="dlg-options">
+  <h3>Optionen</h3>
+  <label class="switch"><span>Hintergrundmusik</span><input type="checkbox" id="opt-music"></label>
+  <label class="switch"><span>Soundeffekte</span><input type="checkbox" id="opt-sfx"></label>
+  <div class="actions"><button class="btn secondary small" id="btn-options-ok">OK</button></div>
+</dialog>
+
+<dialog id="dlg-quit">
+  <h3>Spiel beenden?</h3>
+  <p>Der aktuelle Spielstand geht verloren.</p>
+  <div class="actions">
+    <button class="btn secondary small" id="btn-quit-no">Weiterspielen</button>
+    <button class="btn small" id="btn-quit-yes">Beenden</button>
+  </div>
+</dialog>
+
+<script src="core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

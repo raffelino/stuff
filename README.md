@@ -2,5 +2,5 @@
 
 Here relies stuff that i use...
 
-* `rechenwuerfel/` – Android-Rechenspiel „Rechenwürfel“ (Kotlin, APK-Build siehe dortige README)
+* `rechenwuerfel/` – Rechenspiel „Rechenwürfel“ als Android-App (Kotlin) und Web-Version (`rechenwuerfel/web/`, für GitHub Pages)
 * `calculator/` – kleiner Web-Rechner

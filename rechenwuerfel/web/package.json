@@ -1,0 +1,15 @@
+{
+  "name": "rechenwuerfel-web",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Rechenwürfel – Web-Version (statische Seite, z. B. für GitHub Pages)",
+  "scripts": {
+    "test": "node --test test/core.test.mjs && node --test test/e2e.test.mjs",
+    "test:unit": "node --test test/core.test.mjs",
+    "test:e2e": "node --test test/e2e.test.mjs",
+    "serve": "node test/serve.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.50.0"
+  }
+}
