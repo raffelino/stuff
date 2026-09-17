@@ -1,0 +1,15 @@
+# Gradle / Android Studio
+.gradle/
+build/
+build-nosdk/
+local.properties
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# SDK-freie Pipeline: heruntergeladene Werkzeuge
+tools/nosdk/cache/
+tools/nosdk/build/
+tools/nosdk/.gradle/

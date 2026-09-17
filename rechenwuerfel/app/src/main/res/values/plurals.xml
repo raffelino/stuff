@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="task_info">
+        <item quantity="one">%1$s: richtig = %2$d Feld vor</item>
+        <item quantity="other">%1$s: richtig = %2$d Felder vor</item>
+    </plurals>
+    <plurals name="msg_correct">
+        <item quantity="one">✅ Richtig! Die Figur zieht %1$d Feld vor.</item>
+        <item quantity="other">✅ Richtig! Die Figur zieht %1$d Felder vor.</item>
+    </plurals>
+</resources>

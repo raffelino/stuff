@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#3949AB</color>
+    <color name="primary_dark">#283593</color>
+    <color name="accent">#FFB300</color>
+    <color name="bg_top">#5C6BC0</color>
+    <color name="bg_bottom">#26A69A</color>
+    <color name="panel">#FFFFFF</color>
+    <color name="text_dark">#263238</color>
+    <color name="text_light">#FFFFFF</color>
+    <color name="button_primary">#FF7043</color>
+    <color name="button_primary_pressed">#E64A19</color>
+    <color name="button_secondary">#42A5F5</color>
+    <color name="button_secondary_pressed">#1E88E5</color>
+    <color name="key">#ECEFF1</color>
+    <color name="key_pressed">#CFD8DC</color>
+    <color name="key_ok">#66BB6A</color>
+    <color name="key_back">#EF9A9A</color>
+    <color name="chip">#E8EAF6</color>
+    <color name="chip_selected">#FFB300</color>
+    <color name="ic_launcher_background">#3949AB</color>
+</resources>

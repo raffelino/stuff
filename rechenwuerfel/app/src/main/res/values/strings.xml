@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rechenwürfel</string>
+    <string name="app_subtitle">Würfeln · Rechnen · Gewinnen</string>
+    <string name="play">▶  Spielen</string>
+    <string name="rules">📖  Anleitung</string>
+    <string name="options">⚙  Optionen</string>
+    <string name="ok">OK</string>
+
+    <string name="rules_title">So wird gespielt</string>
+    <string name="rules_text">Bis zu vier Spieler wählen eine Figur und einen Namen.\n\nWer an der Reihe ist, tippt auf den Würfel. Der Würfel zeigt eine Rechenart: Plus, Minus, Mal oder Geteilt. Dazu gibt es einen Joker (Rechenart selbst aussuchen) und Aussetzen.\n\nDann erscheint eine Rechenaufgabe im eingestellten Zahlenraum. Wird sie innerhalb der Zeit richtig gelöst, zieht die Figur vor: Plus 1 Feld, Minus 2, Mal 3, Geteilt 4 (einstellbar). Bei falscher Antwort oder abgelaufener Zeit bleibt die Figur stehen.\n\nWer zuerst das Ziel erreicht, gewinnt!</string>
+
+    <string name="options_title">Optionen</string>
+    <string name="option_music">Hintergrundmusik</string>
+    <string name="option_sfx">Soundeffekte</string>
+
+    <string name="setup_title">Neues Spiel</string>
+    <string name="section_players">Spieler</string>
+    <string name="player_count">Anzahl Spieler</string>
+    <string name="player_n">Spieler %1$d</string>
+    <string name="name_hint">Name</string>
+    <string name="section_settings">Einstellungen</string>
+    <string name="label_range">Zahlenraum bis</string>
+    <string name="label_seconds">Zeit pro Aufgabe (Sekunden)</string>
+    <string name="label_fields">Anzahl Felder auf dem Brett</string>
+    <string name="label_steps">Felder vor bei richtiger Antwort</string>
+    <string name="start_game">🎲  Spiel starten</string>
+    <string name="error_duplicate_figure">Jeder Spieler braucht eine eigene Figur.</string>
+
+    <string name="turn_of">%1$s %2$s ist dran</string>
+    <string name="tap_to_roll">Tippe auf „Würfeln“</string>
+    <string name="rolling">Der Würfel rollt …</string>
+    <string name="roll">🎲  Würfeln</string>
+    <string name="steps_hint">+ %1$d · − %2$d · × %3$d · ÷ %4$d Felder</string>
+    <string name="joker_title">🃏 Joker! Such dir eine Rechenart aus:</string>
+    <string name="seconds_left">%1$d s</string>
+    <string name="msg_skip">💤 %1$s muss leider aussetzen.</string>
+    <string name="msg_wrong">❌ Leider falsch.\nRichtig wäre: %1$s\nDie Figur bleibt stehen.</string>
+    <string name="msg_timeout">⏰ Die Zeit ist abgelaufen!\nRichtig wäre: %1$s\nDie Figur bleibt stehen.</string>
+    <string name="msg_winner">🏆 %1$s %2$s hat gewonnen!</string>
+    <string name="next_player">Weiter ➜</string>
+    <string name="play_again">🔄  Nochmal spielen</string>
+    <string name="to_menu">🏠  Zum Menü</string>
+    <string name="quit_title">Spiel beenden?</string>
+    <string name="quit_text">Der aktuelle Spielstand geht verloren.</string>
+    <string name="quit_yes">Beenden</string>
+    <string name="quit_no">Weiterspielen</string>
+    <string name="key_back">⌫</string>
+    <string name="key_ok">✔</string>
+</resources>
