@@ -51,6 +51,19 @@ object SoundManager {
         soundPool = pool
     }
 
+    /** Setzt den Singleton zurück (für Tests, die pro Testfall einen frischen Application-Context bekommen). */
+    internal fun resetForTests() {
+        try { music?.release() } catch (_: Exception) { }
+        try { soundPool?.release() } catch (_: Exception) { }
+        music = null
+        soundPool = null
+        soundIds.clear()
+        appContext = null
+        foregroundActivities = 0
+        musicEnabled = true
+        sfxEnabled = true
+    }
+
     fun play(sfx: Sfx, volume: Float = 1f) {
         if (!sfxEnabled) return
         val id = soundIds[sfx] ?: return
@@ -87,14 +100,19 @@ object SoundManager {
 
     private fun startMusic() {
         val ctx = appContext ?: return
-        val m = music ?: MediaPlayer.create(ctx, R.raw.music_loop)?.also {
-            it.isLooping = true
-            it.setVolume(0.45f, 0.45f)
-            music = it
-        } ?: return
+        val m = music ?: createMusicPlayer(ctx)?.also { music = it } ?: return
         if (!m.isPlaying) {
             try { m.start() } catch (_: IllegalStateException) { }
         }
+    }
+
+    private fun createMusicPlayer(ctx: Context): MediaPlayer? = try {
+        MediaPlayer.create(ctx, R.raw.music_loop)?.also {
+            it.isLooping = true
+            it.setVolume(0.45f, 0.45f)
+        }
+    } catch (_: Exception) {
+        null // z. B. fehlender Codec: Spiel läuft dann ohne Musik weiter
     }
 
     private fun pauseMusic() {

@@ -181,7 +181,9 @@ class BoardView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         emojiPaint.textSize = radius * 1.35f
 
         // Figuren auf demselben Feld werden leicht versetzt gezeichnet.
-        val order = players.indices.sortedBy { if (it == movingPlayer) 1 else 0 }
+        val order = ArrayList<Int>(players.size)
+        for (i in players.indices) if (i != movingPlayer) order.add(i)
+        if (movingPlayer in players.indices) order.add(movingPlayer)
         for (idx in order) {
             val pos = animPos[idx]
             val p = pathPoint(pos)

@@ -11,14 +11,18 @@ android {
         applicationId = "com.raffelino.rechenwuerfel"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
         }
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
     }
 
     compileOptions {
@@ -36,4 +40,6 @@ kotlin {
 dependencies {
     // Das Spiel nutzt nur das Android-Framework und die Kotlin-Standardbibliothek.
     testImplementation("junit:junit:4.13.2")
+    // Oberflächentests laufen als JVM-Tests mit Robolectric (kein Emulator nötig).
+    testImplementation("org.robolectric:robolectric:4.14.1")
 }

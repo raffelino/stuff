@@ -21,3 +21,14 @@ enum class DiceFace(val symbol: String, val label: String, val operation: Operat
         fun forOperation(op: Operation): DiceFace = values().first { it.operation == op }
     }
 }
+
+/**
+ * Liefert das Würfelergebnis. Standard ist Zufall; Tests können über [override]
+ * eine feste Folge vorgeben.
+ */
+object DiceRoller {
+    @Volatile
+    var override: (() -> DiceFace)? = null
+
+    fun roll(): DiceFace = override?.invoke() ?: DiceFace.values()[kotlin.random.Random.nextInt(DiceFace.values().size)]
+}

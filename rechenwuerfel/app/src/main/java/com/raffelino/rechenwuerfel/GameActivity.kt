@@ -2,7 +2,6 @@ package com.raffelino.rechenwuerfel
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -29,7 +28,7 @@ class GameActivity : BaseActivity() {
     private var task: MathTask? = null
     private var currentFace: DiceFace? = null
     private val answer = StringBuilder()
-    private var timer: CountDownTimer? = null
+    private var timer: TaskTimer? = null
     private var timeLeftMs = 0L
     private var busy = false
     private var maxAnswerDigits = 3
@@ -152,6 +151,12 @@ class GameActivity : BaseActivity() {
 
     private val player: Player get() = players[current]
 
+    /** Positionen aller Spieler (für Tests). */
+    internal val playerPositions: List<Int> get() = players.map { it.position }
+
+    /** Index des Spielers, der gerade dran ist (für Tests). */
+    internal val currentPlayerIndex: Int get() = current
+
     private fun updateHeader() {
         textTurn.text = getString(R.string.turn_of, player.figure, player.name)
         textTurn.setTextColor(player.color)
@@ -172,7 +177,7 @@ class GameActivity : BaseActivity() {
         btnRoll.isEnabled = false
         textDiceHint.text = getString(R.string.rolling)
         SoundManager.play(SoundManager.Sfx.DICE)
-        val face = DiceFace.values()[Random.nextInt(DiceFace.values().size)]
+        val face = DiceRoller.roll()
         diceView.roll(face) { onDiceResult(face) }
     }
 
@@ -218,24 +223,21 @@ class GameActivity : BaseActivity() {
         progressTime.max = 1000
         progressTime.progress = (remainingMs * 1000 / totalMs).toInt()
         var lastSecondTicked = -1
-        timer = object : CountDownTimer(remainingMs, 50) {
-            override fun onTick(millisUntilFinished: Long) {
+        timer = TaskTimer(
+            totalMs = remainingMs,
+            tickMs = 50L,
+            onTick = { millisUntilFinished ->
                 timeLeftMs = millisUntilFinished
                 progressTime.progress = (millisUntilFinished * 1000 / totalMs).toInt()
                 val secs = ((millisUntilFinished + 999) / 1000).toInt()
                 textTimeLeft.text = getString(R.string.seconds_left, secs)
-                if (secs <= 5 && secs != lastSecondTicked) {
+                if (secs in 1..5 && secs != lastSecondTicked) {
                     lastSecondTicked = secs
                     SoundManager.play(SoundManager.Sfx.TICK, 0.6f)
                 }
-            }
-
-            override fun onFinish() {
-                progressTime.progress = 0
-                textTimeLeft.text = getString(R.string.seconds_left, 0)
-                onTimeout()
-            }
-        }.start()
+            },
+            onFinish = { onTimeout() },
+        ).start()
     }
 
     private fun onDigit(d: Int) {

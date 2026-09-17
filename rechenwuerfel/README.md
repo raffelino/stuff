@@ -24,6 +24,20 @@ Ein Brettspiel für 1–4 Spieler: würfeln, Rechenaufgabe lösen, Figur vorzieh
 
 Über **Optionen** (Hauptmenü) oder die Symbole oben im Spiel lassen sich Hintergrundmusik und Soundeffekte getrennt ein- und ausschalten.
 
+## Tests
+
+Alle Tests laufen auf der JVM, ein Emulator ist nicht nötig:
+
+* **Unit-Tests**: Aufgaben-Generator (kein negatives Ergebnis, kein Rest, Zahlenraum eingehalten), Einstellungs-Grenzen, Timer.
+* **Oberflächentests mit Robolectric**: Hauptmenü (Anleitung, Optionen-Dialog, Navigation), Setup (Spieleranzahl, Namen, Figuren-Tausch, Chips, Speichern/Laden, ungültige Eingaben), Spiel (jede Würfelseite, richtige und falsche Antwort, Zeitablauf, Joker, Aussetzen, Tastatur, Timer-Pause, Zurück-Dialog, Sieg, Neustart) sowie ein **Ende-zu-Ende-Durchlauf** von Menü über Konfiguration bis zum Sieg und zurück.
+
+```bash
+./gradlew testDebugUnitTest          # Android Studio / mit SDK
+tools/nosdk/build-apk.sh             # ohne SDK: Tests sind Teil des APK-Builds
+```
+
+Für Tests ist der Würfel über `DiceRoller.override` steuerbar; die Aufgaben werden aus der Anzeige gelesen und gelöst.
+
 ## Technik
 
 * Kotlin, nur Android-Framework (keine AndroidX-Abhängigkeiten), `minSdk 26`, `targetSdk 34`.
@@ -63,10 +77,12 @@ tools/nosdk/         Build der APK ohne Android SDK (siehe unten)
 ### Variante B: ohne Android SDK (nur JDK 17+, Gradle, python3, curl, unzip)
 
 ```bash
-tools/nosdk/build-apk.sh         # -> build-nosdk/rechenwuerfel-1.0.apk
+tools/nosdk/build-apk.sh         # -> build-nosdk/rechenwuerfel-1.1.apk
 ```
 
-Das Skript lädt aapt2, das Framework-Jar, `dx` und `apksig` von Maven Central, kompiliert Kotlin über ein kleines Gradle-Hilfsprojekt, führt die Unit-Tests aus, erzeugt `classes.dex`, paketiert (mit 4-Byte-Alignment) und signiert die APK (Signatur-Schema v2).
+Das Skript lädt aapt2, das Framework-Jar, `dx`, `apksig` und ProGuard von Maven Central, kompiliert Kotlin über ein kleines Gradle-Hilfsprojekt, führt alle Tests aus (Robolectric mit einem schlanken Ersatz für `androidx.test`, siehe `tools/nosdk/androidx-test-stubs`), schrumpft die Kotlin-Stdlib und portiert `invokedynamic`-Lambdas mit ProGuard auf normale Klassen zurück, erzeugt `classes.dex`, prüft die Dex auf `invoke-custom`-Aufrufstellen, paketiert (mit 4-Byte-Alignment) und signiert die APK (Signatur-Schema v2).
+
+Hintergrund: `dx` reicht `invokedynamic` aus der Kotlin-Stdlib unverändert durch, Android kann diese Aufrufe aber nicht ausführen. Ohne den ProGuard-Schritt stürzt die App ab, sobald eine betroffene Stdlib-Methode aufgerufen wird.
 
 Der Schlüssel `tools/nosdk/rechenwuerfel.p12` (Passwort `rechenwuerfel`) ist ein reiner **Entwicklungsschlüssel**. Für eine Veröffentlichung im Play Store muss ein eigener, geheimer Schlüssel verwendet werden.
 
@@ -75,7 +91,7 @@ Der Schlüssel `tools/nosdk/rechenwuerfel.p12` (Passwort `rechenwuerfel`) ist ei
 APK aufs Gerät kopieren, antippen und die Installation aus unbekannter Quelle erlauben – oder per USB:
 
 ```bash
-adb install -r rechenwuerfel-1.0.apk
+adb install -r rechenwuerfel-1.1.apk
 ```
 
 Wird später eine mit anderem Schlüssel signierte Version (z. B. Debug-Build aus Android Studio) installiert, muss die alte App vorher deinstalliert werden.
