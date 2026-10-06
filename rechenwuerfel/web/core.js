@@ -39,7 +39,11 @@
     stepsMinus: 2,
     stepsTimes: 3,
     stepsDivide: 4,
+    /** Rechenarten, die im Spiel vorkommen (mindestens eine). */
+    operations: ["PLUS", "MINUS", "TIMES", "DIVIDE"],
   });
+
+  const OPERATION_KEYS = ["PLUS", "MINUS", "TIMES", "DIVIDE"];
 
   const LIMITS = Object.freeze({
     numberRange: [5, 10000],
@@ -58,14 +62,27 @@
   /** Begrenzt alle Einstellungen auf sinnvolle Bereiche; ungültige Werte werden durch Standardwerte ersetzt. */
   function sanitizeSettings(input) {
     const out = {};
-    for (const key of Object.keys(DEFAULT_SETTINGS)) {
+    for (const key of Object.keys(LIMITS)) {
       const raw = input && input[key];
       const n = typeof raw === "number" ? raw : parseInt(raw, 10);
       const value = Number.isFinite(n) ? n : DEFAULT_SETTINGS[key];
       const [lo, hi] = LIMITS[key];
       out[key] = clamp(Math.round(value), lo, hi);
     }
+    const ops = Array.isArray(input && input.operations)
+      ? OPERATION_KEYS.filter((k) => input.operations.includes(k))
+      : OPERATION_KEYS.slice();
+    out.operations = ops.length ? ops : OPERATION_KEYS.slice(); // ohne Rechenart werden alle aktiviert
     return out;
+  }
+
+  function isEnabled(settings, operationKey) {
+    return settings.operations.includes(operationKey);
+  }
+
+  /** Würfelseiten, die mit diesen Einstellungen fallen können: erlaubte Rechenarten, Joker und Aussetzen. */
+  function allowedFaces(settings) {
+    return DICE_FACES.filter((f) => f.operation === null || isEnabled(settings, f.operation));
   }
 
   function stepsFor(settings, operationKey) {
@@ -186,8 +203,8 @@
   }
 
   return {
-    OPERATIONS, DICE_FACES, FIGURES, PLAYER_COLORS, DEFAULT_SETTINGS, LIMITS,
-    sanitizeSettings, stepsFor, generateTask, movePosition,
+    OPERATIONS, OPERATION_KEYS, DICE_FACES, FIGURES, PLAYER_COLORS, DEFAULT_SETTINGS, LIMITS,
+    sanitizeSettings, isEnabled, allowedFaces, stepsFor, generateTask, movePosition,
     boardLayout, cellCenter, pathPoint, createPlayers, randInt,
   };
 });

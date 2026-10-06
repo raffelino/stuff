@@ -30,5 +30,8 @@ object DiceRoller {
     @Volatile
     var override: (() -> DiceFace)? = null
 
-    fun roll(): DiceFace = override?.invoke() ?: DiceFace.values()[kotlin.random.Random.nextInt(DiceFace.values().size)]
+    fun roll(allowed: List<DiceFace> = DiceFace.values().toList()): DiceFace {
+        val faces = if (allowed.isEmpty()) DiceFace.values().toList() else allowed
+        return override?.invoke() ?: faces[kotlin.random.Random.nextInt(faces.size)]
+    }
 }

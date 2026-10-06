@@ -1,6 +1,6 @@
 # Rechenwürfel – Web-Version
 
-Dieselben Regeln wie die Android-App, als statische Seite ohne Build-Schritt:
+Dieselben Regeln und Einstellungen wie die Android-App (inklusive abwählbarer Rechenarten), als statische Seite ohne Build-Schritt:
 `index.html` + `core.js` (Spiellogik) + `app.js` (Oberfläche, Animationen, Sound).
 Läuft in jedem aktuellen Browser, auch auf dem Handy. Sounds und Musik werden mit der
 Web Audio API erzeugt, Einstellungen bleiben im `localStorage` des Browsers.

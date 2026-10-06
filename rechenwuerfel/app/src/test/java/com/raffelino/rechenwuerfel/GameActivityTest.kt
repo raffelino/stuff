@@ -53,6 +53,7 @@ class GameActivityTest {
         seconds: Int = 5,
         range: Int = 20,
         steps: IntArray = intArrayOf(1, 2, 3, 4),
+        operations: Set<Operation> = Operation.values().toSet(),
     ) {
         val intent = Intent(RuntimeEnvironment.getApplication(), GameActivity::class.java)
         intent.putStringArrayListExtra(GameActivity.EXTRA_NAMES, ArrayList(names))
@@ -61,6 +62,7 @@ class GameActivityTest {
         intent.putExtra(GameActivity.EXTRA_SECONDS, seconds)
         intent.putExtra(GameActivity.EXTRA_FIELDS, fields)
         intent.putExtra(GameActivity.EXTRA_STEPS, steps)
+        intent.putExtra(GameActivity.EXTRA_OPERATIONS, GameSettings(enabledOperations = operations).operationsMask())
         controller = launch(GameActivity::class.java, intent)
         game = controller.get()
     }
@@ -325,6 +327,34 @@ class GameActivityTest {
         assertVisible(game, R.id.panelWin)
         click(game, R.id.btnMenu)
         assertTrue(game.isFinishing)
+    }
+
+    @Test
+    fun excludedOperationsNeverAppear() {
+        startGame(operations = setOf(Operation.PLUS, Operation.DIVIDE))
+        assertEquals("+ 1 · ÷ 4 Felder", text(game, R.id.textStepsHint))
+        // Würfel ohne Vorgabe: nur erlaubte Seiten
+        DiceRoller.override = null
+        val seen = HashSet<DiceFace>()
+        repeat(40) {
+            click(game, R.id.btnRoll)
+            idle(2500)
+            val face = game.findViewById<DiceView>(R.id.diceView).face
+            seen.add(face)
+            assertTrue("unerlaubte Seite $face", face == DiceFace.PLUS || face == DiceFace.DIVIDE || face == DiceFace.JOKER || face == DiceFace.SKIP)
+            // Zug abschließen, egal was gewürfelt wurde
+            if (face == DiceFace.JOKER) {
+                assertVisible(game, R.id.btnJokerPlus)
+                assertVisible(game, R.id.btnJokerDivide)
+                assertGone(game, R.id.btnJokerMinus)
+                assertGone(game, R.id.btnJokerTimes)
+                click(game, R.id.btnJokerPlus)
+            }
+            if (game.findViewById<View>(R.id.panelTask).isShown) answerWrongly()
+            if (game.findViewById<View>(R.id.panelWin).isShown) return
+            finishTurn()
+        }
+        assertTrue("Würfel sollte mehrere erlaubte Seiten zeigen: $seen", seen.size >= 2)
     }
 
     @Test

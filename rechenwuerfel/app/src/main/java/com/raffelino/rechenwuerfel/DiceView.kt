@@ -40,6 +40,10 @@ class DiceView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     val isRolling: Boolean get() = rolling
 
+    /** Seiten, die während der Würfel-Animation durchlaufen werden. */
+    var faces: List<DiceFace> = DiceFace.values().toList()
+        set(value) { field = if (value.isEmpty()) DiceFace.values().toList() else value }
+
     /** Würfelt und zeigt am Ende [result]. */
     fun roll(result: DiceFace, onDone: () -> Unit) {
         roller?.let { handler.removeCallbacks(it) }
@@ -60,7 +64,7 @@ class DiceView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                         animate().scaleX(1f).scaleY(1f).setDuration(120).withEndAction { onDone() }.start()
                     }.start()
                 } else {
-                    face = DiceFace.values()[Random.nextInt(DiceFace.values().size)]
+                    face = faces[Random.nextInt(faces.size)]
                     angle = Random.nextFloat() * 50f - 25f
                     scale = 0.85f + Random.nextFloat() * 0.25f
                     invalidate()

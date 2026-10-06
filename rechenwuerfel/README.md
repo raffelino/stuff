@@ -11,6 +11,7 @@ Ein Brettspiel für 1–4 Spieler: würfeln, Rechenaufgabe lösen, Figur vorzieh
 * Richtig innerhalb der Zeit → die Figur zieht vor: **Plus 1**, **Minus 2**, **Mal 3**, **Geteilt 4** Felder (einstellbar).
 * Falsch oder Zeit abgelaufen → die Figur bleibt stehen.
 * Aufgaben haben nie negative Ergebnisse und keine Reste beim Teilen.
+* Einzelne Rechenarten lassen sich beim Spielstart abwählen (z. B. nur Plus und Minus). Der Würfel zeigt dann nur erlaubte Seiten, der Joker bietet nur erlaubte Rechenarten an.
 
 ## Einstellbar beim Spielstart
 
@@ -21,6 +22,7 @@ Ein Brettspiel für 1–4 Spieler: würfeln, Rechenaufgabe lösen, Figur vorzieh
 | Zeit pro Aufgabe | 30 s |
 | Anzahl Felder auf dem Brett | 30 |
 | Felder pro Rechenart (+ − × ÷) | 1 / 2 / 3 / 4 |
+| Rechenarten im Spiel (abwählbar, mindestens eine) | alle vier |
 
 Über **Optionen** (Hauptmenü) oder die Symbole oben im Spiel lassen sich Hintergrundmusik und Soundeffekte getrennt ein- und ausschalten.
 
@@ -77,7 +79,7 @@ tools/nosdk/         Build der APK ohne Android SDK (siehe unten)
 ### Variante B: ohne Android SDK (nur JDK 17+, Gradle, python3, curl, unzip)
 
 ```bash
-tools/nosdk/build-apk.sh         # -> build-nosdk/rechenwuerfel-1.1.apk
+tools/nosdk/build-apk.sh         # -> build-nosdk/rechenwuerfel-1.2.apk
 ```
 
 Das Skript lädt aapt2, das Framework-Jar, `dx`, `apksig` und ProGuard von Maven Central, kompiliert Kotlin über ein kleines Gradle-Hilfsprojekt, führt alle Tests aus (Robolectric mit einem schlanken Ersatz für `androidx.test`, siehe `tools/nosdk/androidx-test-stubs`), schrumpft die Kotlin-Stdlib und portiert `invokedynamic`-Lambdas mit ProGuard auf normale Klassen zurück, erzeugt `classes.dex`, prüft die Dex auf `invoke-custom`-Aufrufstellen, paketiert (mit 4-Byte-Alignment) und signiert die APK (Signatur-Schema v2).
@@ -96,7 +98,7 @@ auf GitHub Pages hosten lässt. Anleitung, lokaler Start und Tests: [web/README.
 APK aufs Gerät kopieren, antippen und die Installation aus unbekannter Quelle erlauben – oder per USB:
 
 ```bash
-adb install -r rechenwuerfel-1.1.apk
+adb install -r rechenwuerfel-1.2.apk
 ```
 
 Wird später eine mit anderem Schlüssel signierte Version (z. B. Debug-Build aus Android Studio) installiert, muss die alte App vorher deinstalliert werden.

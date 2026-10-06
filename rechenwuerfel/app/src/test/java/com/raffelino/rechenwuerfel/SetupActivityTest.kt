@@ -155,6 +155,39 @@ class SetupActivityTest {
     }
 
     @Test
+    fun operationsCanBeDeselectedAndArePersisted() {
+        val activity = launch(SetupActivity::class.java).get()
+        val checkMinus = activity.findViewById<android.widget.CheckBox>(R.id.checkMinus)
+        val checkTimes = activity.findViewById<android.widget.CheckBox>(R.id.checkTimes)
+        assertTrue(checkMinus.isChecked && checkTimes.isChecked)
+        checkMinus.performClick()
+        checkTimes.performClick()
+        assertFalse(checkMinus.isChecked)
+        assertFalse(activity.findViewById<EditText>(R.id.editStepsMinus).isEnabled)
+        assertTrue(activity.findViewById<EditText>(R.id.editStepsPlus).isEnabled)
+
+        click(activity, R.id.btnStart)
+        val intent = assertNextActivity(activity, GameActivity::class.java)
+        assertEquals(0b1001, intent.getIntExtra(GameActivity.EXTRA_OPERATIONS, -1))
+        assertEquals(setOf(Operation.PLUS, Operation.DIVIDE), GameSettings.load(RuntimeEnvironment.getApplication()).enabledOperations)
+
+        val again = launch(SetupActivity::class.java).get()
+        assertFalse(again.findViewById<android.widget.CheckBox>(R.id.checkMinus).isChecked)
+        assertTrue(again.findViewById<android.widget.CheckBox>(R.id.checkDivide).isChecked)
+    }
+
+    @Test
+    fun atLeastOneOperationIsRequired() {
+        val activity = launch(SetupActivity::class.java).get()
+        for (id in listOf(R.id.checkPlus, R.id.checkMinus, R.id.checkTimes, R.id.checkDivide)) {
+            activity.findViewById<android.widget.CheckBox>(id).performClick()
+        }
+        click(activity, R.id.btnStart)
+        assertEquals(null, org.robolectric.Shadows.shadowOf(activity).nextStartedActivity)
+        assertEquals("Bitte mindestens eine Rechenart auswählen.", org.robolectric.shadows.ShadowToast.getTextOfLatestToast())
+    }
+
+    @Test
     fun invalidInputsAreSanitized() {
         val activity = launch(SetupActivity::class.java).get()
         activity.findViewById<EditText>(R.id.editRange).setText("")

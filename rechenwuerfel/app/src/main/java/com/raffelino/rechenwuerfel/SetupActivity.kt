@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -32,6 +33,7 @@ class SetupActivity : BaseActivity() {
     private lateinit var editStepsMinus: EditText
     private lateinit var editStepsTimes: EditText
     private lateinit var editStepsDivide: EditText
+    private lateinit var operationChecks: Map<Operation, CheckBox>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +47,24 @@ class SetupActivity : BaseActivity() {
         editStepsMinus = findViewById(R.id.editStepsMinus)
         editStepsTimes = findViewById(R.id.editStepsTimes)
         editStepsDivide = findViewById(R.id.editStepsDivide)
+        operationChecks = mapOf(
+            Operation.PLUS to findViewById(R.id.checkPlus),
+            Operation.MINUS to findViewById(R.id.checkMinus),
+            Operation.TIMES to findViewById(R.id.checkTimes),
+            Operation.DIVIDE to findViewById(R.id.checkDivide),
+        )
+        // Die zugehörige Felder-Eingabe ist nur bei aktiver Rechenart bedienbar
+        val stepInputs = mapOf(
+            Operation.PLUS to editStepsPlus, Operation.MINUS to editStepsMinus,
+            Operation.TIMES to editStepsTimes, Operation.DIVIDE to editStepsDivide,
+        )
+        for ((op, check) in operationChecks) {
+            check.setOnCheckedChangeListener { _, checked ->
+                click()
+                stepInputs.getValue(op).isEnabled = checked
+                stepInputs.getValue(op).alpha = if (checked) 1f else 0.4f
+            }
+        }
 
         val prefs = getSharedPreferences(GameSettings.PREFS, Context.MODE_PRIVATE)
         playerCount = prefs.getInt(GameSettings.KEY_PLAYER_COUNT, 2).coerceIn(1, 4)
@@ -89,6 +109,7 @@ class SetupActivity : BaseActivity() {
         editStepsMinus.setText(s.stepsMinus.toString())
         editStepsTimes.setText(s.stepsTimes.toString())
         editStepsDivide.setText(s.stepsDivide.toString())
+        for ((op, check) in operationChecks) check.isChecked = s.isEnabled(op)
 
         bindChip(R.id.chipRange20, editRange, 20)
         bindChip(R.id.chipRange50, editRange, 50)
@@ -156,6 +177,11 @@ class SetupActivity : BaseActivity() {
     private fun readInt(e: EditText, fallback: Int): Int = e.text.toString().trim().toIntOrNull() ?: fallback
 
     private fun startGame() {
+        val enabledOps = operationChecks.filterValues { it.isChecked }.keys
+        if (enabledOps.isEmpty()) {
+            Toast.makeText(this, R.string.error_no_operation, Toast.LENGTH_SHORT).show()
+            return
+        }
         val defaults = GameSettings()
         val settings = GameSettings(
             numberRange = readInt(editRange, defaults.numberRange),
@@ -165,6 +191,7 @@ class SetupActivity : BaseActivity() {
             stepsMinus = readInt(editStepsMinus, defaults.stepsMinus),
             stepsTimes = readInt(editStepsTimes, defaults.stepsTimes),
             stepsDivide = readInt(editStepsDivide, defaults.stepsDivide),
+            enabledOperations = enabledOps,
         ).sanitized()
         GameSettings.save(this, settings)
 
@@ -195,6 +222,7 @@ class SetupActivity : BaseActivity() {
         intent.putExtra(GameActivity.EXTRA_SECONDS, settings.secondsPerTask)
         intent.putExtra(GameActivity.EXTRA_FIELDS, settings.boardFields)
         intent.putExtra(GameActivity.EXTRA_STEPS, intArrayOf(settings.stepsPlus, settings.stepsMinus, settings.stepsTimes, settings.stepsDivide))
+        intent.putExtra(GameActivity.EXTRA_OPERATIONS, settings.operationsMask())
         startActivity(intent)
     }
 }

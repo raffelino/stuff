@@ -23,8 +23,8 @@ APP="$ROOT/app/src/main"
 CENTRAL="${MAVEN_CENTRAL:-https://repo.maven.apache.org/maven2}"
 
 PACKAGE="com.raffelino.rechenwuerfel"
-VERSION_CODE=2
-VERSION_NAME="1.1"
+VERSION_CODE=3
+VERSION_NAME="1.2"
 MIN_SDK=26
 TARGET_SDK=34
 

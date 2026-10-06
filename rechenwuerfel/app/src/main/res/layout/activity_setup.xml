@@ -89,18 +89,22 @@
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="+" android:textColor="#2E7D32" android:textSize="26sp" android:textStyle="bold" />
                     <EditText android:id="@+id/editStepsPlus" style="@style/NumberInput" android:layout_width="64dp" android:layout_height="wrap_content" android:background="@drawable/bg_input" android:maxLength="2" />
+                    <CheckBox android:id="@+id/checkPlus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/label_operation_enabled" android:textSize="13sp" />
                 </LinearLayout>
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="−" android:textColor="#C62828" android:textSize="26sp" android:textStyle="bold" />
                     <EditText android:id="@+id/editStepsMinus" style="@style/NumberInput" android:layout_width="64dp" android:layout_height="wrap_content" android:background="@drawable/bg_input" android:maxLength="2" />
+                    <CheckBox android:id="@+id/checkMinus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/label_operation_enabled" android:textSize="13sp" />
                 </LinearLayout>
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="×" android:textColor="#1565C0" android:textSize="26sp" android:textStyle="bold" />
                     <EditText android:id="@+id/editStepsTimes" style="@style/NumberInput" android:layout_width="64dp" android:layout_height="wrap_content" android:background="@drawable/bg_input" android:maxLength="2" />
+                    <CheckBox android:id="@+id/checkTimes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/label_operation_enabled" android:textSize="13sp" />
                 </LinearLayout>
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="÷" android:textColor="#6A1B9A" android:textSize="26sp" android:textStyle="bold" />
                     <EditText android:id="@+id/editStepsDivide" style="@style/NumberInput" android:layout_width="64dp" android:layout_height="wrap_content" android:background="@drawable/bg_input" android:maxLength="2" />
+                    <CheckBox android:id="@+id/checkDivide" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/label_operation_enabled" android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

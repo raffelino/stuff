@@ -20,6 +20,7 @@ class GameActivity : BaseActivity() {
         const val EXTRA_SECONDS = "seconds"
         const val EXTRA_FIELDS = "fields"
         const val EXTRA_STEPS = "steps"
+        const val EXTRA_OPERATIONS = "operations"
     }
 
     private lateinit var settings: GameSettings
@@ -68,6 +69,7 @@ class GameActivity : BaseActivity() {
             secondsPerTask = intent.getIntExtra(EXTRA_SECONDS, 30),
             boardFields = intent.getIntExtra(EXTRA_FIELDS, 30),
             stepsPlus = steps[0], stepsMinus = steps[1], stepsTimes = steps[2], stepsDivide = steps[3],
+            enabledOperations = GameSettings.operationsFromMask(intent.getIntExtra(EXTRA_OPERATIONS, 0b1111)),
         ).sanitized()
         maxAnswerDigits = settings.numberRange.toString().length + 1
 
@@ -117,10 +119,17 @@ class GameActivity : BaseActivity() {
             click()
         }
 
-        findViewById<Button>(R.id.btnJokerPlus).setOnClickListener { chooseJoker(Operation.PLUS) }
-        findViewById<Button>(R.id.btnJokerMinus).setOnClickListener { chooseJoker(Operation.MINUS) }
-        findViewById<Button>(R.id.btnJokerTimes).setOnClickListener { chooseJoker(Operation.TIMES) }
-        findViewById<Button>(R.id.btnJokerDivide).setOnClickListener { chooseJoker(Operation.DIVIDE) }
+        val jokerButtons = mapOf(
+            Operation.PLUS to R.id.btnJokerPlus, Operation.MINUS to R.id.btnJokerMinus,
+            Operation.TIMES to R.id.btnJokerTimes, Operation.DIVIDE to R.id.btnJokerDivide,
+        )
+        for ((op, id) in jokerButtons) {
+            val b = findViewById<Button>(id)
+            b.setOnClickListener { chooseJoker(op) }
+            // Abgewählte Rechenarten stehen auch beim Joker nicht zur Wahl
+            b.visibility = if (settings.isEnabled(op)) View.VISIBLE else View.GONE
+        }
+        diceView.faces = settings.allowedFaces()
 
         val keyIds = intArrayOf(
             R.id.key0, R.id.key1, R.id.key2, R.id.key3, R.id.key4,
@@ -135,10 +144,9 @@ class GameActivity : BaseActivity() {
         findViewById<Button>(R.id.btnPlayAgain).setOnClickListener { click(); restartGame() }
         findViewById<Button>(R.id.btnMenu).setOnClickListener { click(); finish() }
 
-        val stepsHint = getString(
-            R.string.steps_hint,
-            settings.stepsPlus, settings.stepsMinus, settings.stepsTimes, settings.stepsDivide,
-        )
+        val stepsHint = Operation.values()
+            .filter { settings.isEnabled(it) }
+            .joinToString(" · ") { "${it.symbol} ${settings.stepsFor(it)}" } + " " + getString(R.string.fields_word)
         findViewById<TextView>(R.id.textStepsHint).text = stepsHint
     }
 
@@ -177,7 +185,7 @@ class GameActivity : BaseActivity() {
         btnRoll.isEnabled = false
         textDiceHint.text = getString(R.string.rolling)
         SoundManager.play(SoundManager.Sfx.DICE)
-        val face = DiceRoller.roll()
+        val face = DiceRoller.roll(settings.allowedFaces())
         diceView.roll(face) { onDiceResult(face) }
     }
 

@@ -168,6 +168,10 @@ h1, h2, h3, .display { font-family: var(--font-display); font-weight: 800; text-
 .steps .op { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .steps .op span { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; line-height: 1; }
 .steps .num { width: 100%; max-width: 72px; }
+.steps .num:disabled { opacity: .4; }
+.op-check { display: flex; align-items: center; gap: 4px; font-size: .8rem; font-weight: 700; color: var(--ink-soft); }
+.op-check input { width: 18px; height: 18px; accent-color: var(--primary); margin: 0; }
+#ops-error { color: var(--coral-deep); font-weight: 700; }
 .settings-card { display: flex; flex-direction: column; gap: 14px; }
 
 /* ---------- Spiel ---------- */
@@ -308,13 +312,14 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top
         <input class="num" id="set-fields" type="number" inputmode="numeric" min="6" max="120">
       </div>
       <div class="field">
-        <label>Felder vor bei richtiger Antwort</label>
+        <label>Rechenarten und Felder vor bei richtiger Antwort</label>
         <div class="steps">
-          <div class="op"><span style="color:#2E7D32">+</span><input class="num" id="set-steps-plus" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Plus"></div>
-          <div class="op"><span style="color:#C62828">−</span><input class="num" id="set-steps-minus" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Minus"></div>
-          <div class="op"><span style="color:#1565C0">×</span><input class="num" id="set-steps-times" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Mal"></div>
-          <div class="op"><span style="color:#6A1B9A">÷</span><input class="num" id="set-steps-divide" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Geteilt"></div>
+          <div class="op"><span style="color:#2E7D32">+</span><input class="num" id="set-steps-plus" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Plus"><label class="op-check"><input type="checkbox" id="op-PLUS" checked> dabei</label></div>
+          <div class="op"><span style="color:#C62828">−</span><input class="num" id="set-steps-minus" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Minus"><label class="op-check"><input type="checkbox" id="op-MINUS" checked> dabei</label></div>
+          <div class="op"><span style="color:#1565C0">×</span><input class="num" id="set-steps-times" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Mal"><label class="op-check"><input type="checkbox" id="op-TIMES" checked> dabei</label></div>
+          <div class="op"><span style="color:#6A1B9A">÷</span><input class="num" id="set-steps-divide" type="number" inputmode="numeric" min="1" max="20" aria-label="Felder bei Geteilt"><label class="op-check"><input type="checkbox" id="op-DIVIDE" checked> dabei</label></div>
         </div>
+        <div class="hint small" id="ops-error" role="alert" hidden>Bitte mindestens eine Rechenart auswählen.</div>
       </div>
     </div>
 

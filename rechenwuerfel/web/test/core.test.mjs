@@ -75,6 +75,17 @@ test("Einstellungen werden begrenzt und ergänzt", () => {
   assert.deepEqual(core.sanitizeSettings(undefined), core.DEFAULT_SETTINGS);
 });
 
+test("Rechenarten lassen sich ausschließen", () => {
+  const s = core.sanitizeSettings({ operations: ["DIVIDE", "PLUS", "MODULO"] });
+  assert.deepEqual(s.operations, ["PLUS", "DIVIDE"]);
+  assert.ok(core.isEnabled(s, "PLUS") && !core.isEnabled(s, "MINUS"));
+  assert.deepEqual(core.allowedFaces(s).map((f) => f.key), ["PLUS", "DIVIDE", "JOKER", "SKIP"]);
+  // Ohne Rechenart werden alle aktiviert
+  assert.deepEqual(core.sanitizeSettings({ operations: [] }).operations, core.OPERATION_KEYS);
+  assert.deepEqual(core.sanitizeSettings({}).operations, core.OPERATION_KEYS);
+  assert.equal(core.allowedFaces(core.sanitizeSettings({})).length, 6);
+});
+
 test("Zug endet spätestens im Ziel", () => {
   assert.equal(core.movePosition(0, 4, 30), 4);
   assert.equal(core.movePosition(27, 4, 30), 29);

@@ -294,8 +294,16 @@
     click();
     $("set-" + b.dataset.set).value = b.dataset.value;
   }));
+  const stepInputFor = { PLUS: "set-steps-plus", MINUS: "set-steps-minus", TIMES: "set-steps-times", DIVIDE: "set-steps-divide" };
+  function refreshOperationInputs() {
+    for (const op of C.OPERATION_KEYS) $(stepInputFor[op]).disabled = !$("op-" + op).checked;
+    $("ops-error").hidden = C.OPERATION_KEYS.some((op) => $("op-" + op).checked);
+  }
+  for (const op of C.OPERATION_KEYS) $("op-" + op).addEventListener("change", () => { click(); refreshOperationInputs(); });
   function loadSettingsForm() {
     const s = C.sanitizeSettings(store.get("settings", C.DEFAULT_SETTINGS));
+    for (const op of C.OPERATION_KEYS) $("op-" + op).checked = C.isEnabled(s, op);
+    refreshOperationInputs();
     $("set-range").value = s.numberRange;
     $("set-seconds").value = s.secondsPerTask;
     $("set-fields").value = s.boardFields;
@@ -313,11 +321,17 @@
       stepsMinus: $("set-steps-minus").value,
       stepsTimes: $("set-steps-times").value,
       stepsDivide: $("set-steps-divide").value,
+      operations: C.OPERATION_KEYS.filter((op) => $("op-" + op).checked),
     });
   }
   $("btn-setup-back").addEventListener("click", () => { click(); showScreen("menu"); });
   $("btn-start").addEventListener("click", () => {
     click();
+    if (!C.OPERATION_KEYS.some((op) => $("op-" + op).checked)) {
+      $("ops-error").hidden = false;
+      $("ops-error").scrollIntoView({ block: "center" });
+      return;
+    }
     const settings = readSettingsForm();
     store.set("settings", settings);
     const names = setup.rows.slice(0, setup.count).map((r, i) => r.name.value.trim() || `Spieler ${i + 1}`);
@@ -462,6 +476,7 @@
   const dice = {
     el: $("dice"),
     rolling: false,
+    faces: C.DICE_FACES,
     show(face) {
       this.el.textContent = face.symbol;
       this.el.style.setProperty("--face-color", face.color);
@@ -472,7 +487,7 @@
       const start = performance.now();
       while (performance.now() - start < T.roll) {
         const elapsed = performance.now() - start;
-        this.show(C.DICE_FACES[Math.floor(Math.random() * C.DICE_FACES.length)]);
+        this.show(this.faces[Math.floor(Math.random() * this.faces.length)]);
         this.el.style.transform = `rotate(${Math.random() * 50 - 25}deg) scale(${0.85 + Math.random() * 0.25})`;
         await sleep(60 + elapsed / 6);
       }
@@ -502,7 +517,11 @@
       this.answer = "";
       this.busy = false;
       this.maxDigits = String(settings.numberRange).length + 1;
-      $("steps-hint").textContent = `+ ${settings.stepsPlus} · − ${settings.stepsMinus} · × ${settings.stepsTimes} · ÷ ${settings.stepsDivide} Felder`;
+      $("steps-hint").textContent = settings.operations
+        .map((op) => `${C.OPERATIONS[op].symbol} ${C.stepsFor(settings, op)}`).join(" · ") + " Felder";
+      // Abgewählte Rechenarten stehen auch beim Joker nicht zur Wahl
+      document.querySelectorAll("#panel-joker .key").forEach((b) => { b.hidden = !C.isEnabled(settings, b.dataset.op); });
+      dice.faces = C.allowedFaces(settings);
       showScreen("game");
       board.setup(settings.boardFields, players);
       board.current = 0;
@@ -531,7 +550,10 @@
       $("dice-hint").textContent = "Der Würfel rollt …";
       audio.play("dice");
       const override = window.Rechenwuerfel.diceOverride;
-      const face = override ? C.DICE_FACES.find((f) => f.key === (typeof override === "function" ? override() : override)) : C.DICE_FACES[Math.floor(Math.random() * 6)];
+      const allowed = C.allowedFaces(this.settings);
+      const face = override
+        ? C.DICE_FACES.find((f) => f.key === (typeof override === "function" ? override() : override))
+        : allowed[Math.floor(Math.random() * allowed.length)];
       await dice.roll(face);
       $("dice-hint").textContent = face.label;
       if (face.key === "SKIP") {

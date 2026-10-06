@@ -247,6 +247,65 @@ test("Komplettes Spiel mit drei Spielern bis zum Sieg, Neustart und zurück ins 
   assert.deepEqual(page.errors, []);
 });
 
+test("Ausgeschlossene Rechenarten kommen nicht vor", async () => {
+  await page.click("#btn-play");
+  await page.uncheck("#op-MINUS");
+  await page.uncheck("#op-TIMES");
+  assert.ok(await page.isDisabled("#set-steps-minus"));
+  assert.ok(!(await page.isDisabled("#set-steps-plus")));
+  await page.fill("#set-fields", "120");
+  await page.click("#btn-start");
+  await waitPhase("roll");
+  assert.deepEqual((await state()).settings.operations, ["PLUS", "DIVIDE"]);
+  assert.equal(await page.textContent("#steps-hint"), "+ 1 · ÷ 4 Felder");
+
+  // 25 echte Zufallswürfe: nur erlaubte Seiten; Joker bietet nur erlaubte Rechenarten an
+  const seen = new Set();
+  for (let i = 0; i < 25; i++) {
+    await page.click("#btn-roll");
+    await page.waitForFunction(() => window.Rechenwuerfel.state().phase !== "roll", null, { timeout: 8000 });
+    const phase = (await state()).phase;
+    if (phase === "joker") {
+      seen.add("JOKER");
+      assert.ok(await visible('#panel-joker [data-op="PLUS"]'));
+      assert.ok(await visible('#panel-joker [data-op="DIVIDE"]'));
+      assert.ok(!(await visible('#panel-joker [data-op="MINUS"]')));
+      assert.ok(!(await visible('#panel-joker [data-op="TIMES"]')));
+      await page.click('#panel-joker [data-op="DIVIDE"]');
+    }
+    if ((await state()).phase === "task") {
+      const q = await page.textContent("#question");
+      assert.doesNotMatch(q, /[−×]/, "unerlaubte Rechenart: " + q);
+      seen.add(q.includes("+") ? "PLUS" : "DIVIDE");
+      await solve(1); // absichtlich falsch, damit niemand gewinnt
+    } else if (phase === "message") {
+      seen.add("SKIP");
+    }
+    await next();
+  }
+  assert.ok(seen.size >= 2, "mehrere erlaubte Seiten gesehen: " + [...seen]);
+  assert.deepEqual(page.errors, []);
+});
+
+test("Ohne Rechenart startet kein Spiel", async () => {
+  await page.click("#btn-play");
+  for (const op of ["PLUS", "MINUS", "TIMES", "DIVIDE"]) await page.uncheck("#op-" + op);
+  assert.ok(await visible("#ops-error"));
+  await page.click("#btn-start");
+  assert.ok(await visible("#screen-setup"));
+  await page.check("#op-TIMES");
+  assert.ok(!(await visible("#ops-error")));
+  await page.click("#btn-start");
+  await waitPhase("roll");
+  assert.deepEqual((await state()).settings.operations, ["TIMES"]);
+  // Einstellung bleibt erhalten
+  await page.reload();
+  await page.click("#btn-play");
+  assert.ok(!(await page.isChecked("#op-PLUS")));
+  assert.ok(await page.isChecked("#op-TIMES"));
+  assert.deepEqual(page.errors, []);
+});
+
 test("Audio-Schalter im Spiel", async () => {
   await startGame();
   assert.equal(await page.textContent("#btn-music"), "🎵");
